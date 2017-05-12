@@ -2,8 +2,9 @@ cmake_minimum_required(VERSION 2.8)
 project(DLoopDetector)
 include(ExternalProject)
 
-option(BUILD_DemoBRIEF  "Build demo application with BRIEF features" OFF)
-option(BUILD_DemoSURF   "Build demo application with SURF features"  OFF)
+option(BUILD_DemoBRIEF  "Build demo application with BRIEF features" ON)
+option(BUILD_DemoSURF   "Build demo application with SURF features"  ON)
+option(BUILD_DemoFORB   "Build demo application with FORB features"  ON)
 
 if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
   set(CMAKE_BUILD_TYPE Release CACHE STRING "Choose the type of build." FORCE)
@@ -31,7 +32,7 @@ find_package(OpenCV REQUIRED)
 include_directories(${OpenCV_INCLUDE_DIRS})
 
 macro(GetDependency name other_dependency)
-  find_package(${name} QUIET 
+  find_package(${name} QUIET
     PATHS ${DEPENDENCY_INSTALL_DIR})
   if(${${name}_FOUND})
     message("${name} library found, using it from the system")
@@ -70,7 +71,12 @@ if(BUILD_DemoSURF)
   target_link_libraries(demo_surf ${OpenCV_LIBS} ${DLib_LIBS} ${DBoW2_LIBS})
 endif(BUILD_DemoSURF)
 
-if(BUILD_DemoBRIEF OR BUILD_DemoSURF)
+if(BUILD_DemoFORB)
+  add_executable(demo_forb demo/demo_forb.cpp)
+  target_link_libraries(demo_forb ${OpenCV_LIBS} ${DLib_LIBS} ${DBoW2_LIBS})
+endif(BUILD_DemoFORB)
+
+if(BUILD_DemoBRIEF OR BUILD_DemoSURF OR BUILD_DemoFORB)
   option(DOWNLOAD_Demo_Resources "Download resources for demo application" ON)
   if(DOWNLOAD_Demo_Resources)
     set(RESOURCES_DIR ${CMAKE_CURRENT_BINARY_DIR}/resources/)
@@ -88,7 +94,7 @@ if(BUILD_DemoBRIEF OR BUILD_DemoSURF)
   else()
     message("Demo resources are not going to be downloaded unless the option is activated. Demo applications will not work")
   endif(DOWNLOAD_Demo_Resources)
-endif(BUILD_DemoBRIEF OR BUILD_DemoSURF)
+endif(BUILD_DemoBRIEF OR BUILD_DemoSURF OR BUILD_DemoFORB)
 
 configure_file(src/DLoopDetector.cmake.in
   "${PROJECT_BINARY_DIR}/DLoopDetectorConfig.cmake" @ONLY)
@@ -96,6 +102,6 @@ configure_file(src/DLoopDetector.cmake.in
 install(DIRECTORY include/DLoopDetector DESTINATION ${CMAKE_INSTALL_PREFIX}/include)
 install(FILES "${CMAKE_CURRENT_BINARY_DIR}/DLoopDetectorConfig.cmake"
   DESTINATION ${CMAKE_INSTALL_PREFIX}/include/${PROJECT_NAME})
-install(FILES "${PROJECT_BINARY_DIR}/DLoopDetectorConfig.cmake" 
+install(FILES "${PROJECT_BINARY_DIR}/DLoopDetectorConfig.cmake"
   DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/cmake/DLoopDetector/)
 install(DIRECTORY ${DEPENDENCY_INSTALL_DIR}/ DESTINATION ${CMAKE_INSTALL_PREFIX} OPTIONAL)

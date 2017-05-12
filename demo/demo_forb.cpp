@@ -36,7 +36,7 @@ FORBDatabase;
 
 // ----------------------------------------------------------------------------
 
-static const char *VOC_FILE = "./resources/ORBvoc.txt";
+static const char *VOC_FILE = "./resources/orb_orbslam2.voc.gz";
 static const char *IMAGE_DIR = "./resources/images";
 static const char *POSE_FILE = "./resources/pose.txt";
 static const int IMAGE_W = 640; // image size
